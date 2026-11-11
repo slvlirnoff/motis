@@ -1,4 +1,5 @@
 #include "motis/endpoints/one_to_all.h"
+#include "motis/segment_tags.h"
 
 #include <algorithm>
 #include <chrono>
@@ -131,6 +132,7 @@ api::Reachable one_to_all::operator()(boost::urls::url_view const& url) const {
               .min_transfer_time_ = n::duration_t{query.minTransferTime_},
               .additional_time_ = n::duration_t{query.additionalTransferTime_},
               .factor_ = static_cast<float>(query.transferTimeFactor_)},
+      .segment_filter_ = make_segment_filter(query.allowedSegmentTags_),
   };
 
   if (tt_.locations_.footpaths_out_.at(q.prf_idx_).empty()) {

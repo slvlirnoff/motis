@@ -1,4 +1,5 @@
 #include "motis/endpoints/routing.h"
+#include "motis/segment_tags.h"
 
 #include <algorithm>
 #include <cmath>
@@ -1143,7 +1144,8 @@ api::plan_response routing::route(api::plan_params const& query,
                                : std::optional{fastest_direct},
         .fastest_direct_factor_ = query.fastestDirectFactor_,
         .slow_direct_ = query.slowDirect_,
-        .fastest_slow_direct_factor_ = query.fastestSlowDirectFactor_};
+        .fastest_slow_direct_factor_ = query.fastestSlowDirectFactor_,
+        .segment_filter_ = make_segment_filter(query.allowedSegmentTags_)};
     remove_slower_than_fastest_direct(q);
     UTL_STOP_TIMING(query_preparation);
 
@@ -1203,7 +1205,8 @@ api::plan_response routing::route(api::plan_params const& query,
       }
 #endif
 
-      if (algorithm == api::algorithmEnum::PONG && pong_applicable) {
+      if (algorithm == api::algorithmEnum::PONG && pong_applicable &&
+          q.segment_filter_ == nullptr) {
         try {
           auto raptor_state = n::routing::raptor_state{};
           r = n::routing::pong_search(
@@ -1224,7 +1227,8 @@ api::plan_response routing::route(api::plan_params const& query,
                  !q.td_start_.empty() || !q.td_dest_.empty() ||
                  !q.transfer_time_settings_.default_ || !q.via_stops_.empty() ||
                  q.require_bike_transport_ || q.require_car_transport_ ||
-                 q.no_compulsory_reservation_) {
+                 q.no_compulsory_reservation_ ||
+                 q.segment_filter_ != nullptr) {
         auto raptor_state = n::routing::raptor_state{};
         r = n::routing::raptor_search(
             *tt_, rtt, search_state, raptor_state, q,

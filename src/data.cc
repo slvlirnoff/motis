@@ -1,4 +1,5 @@
 #include "motis/data.h"
+#include "motis/segment_tags.h"
 
 #include <filesystem>
 #include <future>
@@ -345,6 +346,7 @@ void data::load_tt(fs::path const& p) {
   tags_ = tag_lookup::read(path_ / "tags.bin");
   tt_ = n::timetable::read(path_ / p);
   tt_->resolve();
+  load_segment_tags(*tt_);
   location_rtree_ = std::make_unique<point_rtree<n::location_idx_t>>(
       create_location_rtree(*tt_));
   init_rtt();

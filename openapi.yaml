@@ -798,6 +798,23 @@ paths:
             default: 900
             minimum: 0
 
+        - name: allowedSegmentTags
+          in: query
+          required: false
+          description: |
+            Optional. PROTOTYPE (fork only).
+
+            If given, transit rides may only cross route sections (two consecutive stops)
+            that have a group of segment tags lying entirely in this list (a section may carry
+            several groups, e.g. one per fare network). Sections without tags are not allowed.
+            Requires the server to be started with `MOTIS_SEGMENT_TAGS=<csv file>`.
+            Forces the RAPTOR algorithm. Example: `mobilis:11,mobilis:12`.
+          schema:
+            type: array
+            items:
+              type: string
+          explode: false
+
         - name: requireBikeTransport
           in: query
           required: false
@@ -2114,6 +2131,23 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/Mode'
+          explode: false
+
+        - name: allowedSegmentTags
+          in: query
+          required: false
+          description: |
+            Optional. PROTOTYPE (fork only).
+
+            If given, transit rides may only cross route sections (two consecutive stops)
+            that have a group of segment tags lying entirely in this list (a section may carry
+            several groups, e.g. one per fare network). Sections without tags are not allowed.
+            Requires the server to be started with `MOTIS_SEGMENT_TAGS=<csv file>`.
+            Forces the RAPTOR algorithm. Example: `mobilis:11,mobilis:12`.
+          schema:
+            type: array
+            items:
+              type: string
           explode: false
 
         - name: requireBikeTransport
