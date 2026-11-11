@@ -16,11 +16,17 @@ namespace {
 
 std::unique_ptr<n::routing::segment_tags> g_segment_tags;
 
-// Station number of a location: the id of its parent (or its own),
-//   "Parentch:1:sloid:4121", "ch:1:sloid:4121:0:1" -> 8504121 (85 + sloid, 5 digits)
-//   "Parent8002140", "8002140:0:1"                  -> 8002140
-// 0 if the id has no such number. (Swiss GTFS shortcut - a real version
-// would take the ids of the file as-is: <tag>_<stop_id>.)
+// Station number of a location: the id of its parent (or its own).
+//   "Parentch:1:sloid:4121", "ch:1:sloid:4121:0:1" -> 8504121
+//       Swiss stop: sloid number of up to 5 digits, prefixed with 85
+//   "ch:1:sloid:1400679[:x:y]"                       -> 1400679
+//       stop abroad (French bus stops, ...): 6 digits and more, taken as is
+//   "Parent8774549", "8002140:0:1"                   -> 8774549, 8002140
+//       plain number (UIC), taken as is
+// 0 if the id has no such number. Same rule as stationId() (engine,
+// routing/motis.ts) and gtfsStationNumber() (segment file exporter).
+// (Swiss GTFS shortcut - a real version would take the ids of the file as-is:
+// <tag>_<stop_id>.)
 n::routing::segment_tags::station_key_t station_key(n::timetable const& tt,
                                                     n::location_idx_t l) {
   if (auto const p = tt.locations_.parents_[l];
@@ -41,7 +47,8 @@ n::routing::segment_tags::station_key_t station_key(n::timetable const& tt,
   if (ec != std::errc{} || ptr == id.data()) {
     return 0U;
   }
-  return is_sloid ? (v < 100'000U ? 8'500'000U + v : 0U) : v;
+  auto const n_digits = ptr - id.data();
+  return is_sloid && n_digits <= 5 ? 8'500'000U + v : v;
 }
 
 }  // namespace

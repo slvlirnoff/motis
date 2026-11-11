@@ -37,7 +37,7 @@
 [nigiri]
   url=git@github.com:slvlirnoff/nigiri.git
   branch=segment-tags
-  commit=7a234afa9af3a4e0cfbc9f7db9d84fa256777c29
+  commit=6e6538fcd2ff6288f7ddace74c2ea2d31865a7ce
 [openapi-cpp]
   url=git@github.com:triptix-tech/openapi-cpp.git
   branch=master
